@@ -13,9 +13,8 @@
       --muted: #475569;
       --border: #e2e8f0;
       --accent: #16a34a;
-      --warning-bg: #fffbeb;
-      --warning-border: #fcd34d;
-      --warning-text: #92400e;
+      --shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 12px 28px rgba(15, 23, 42, 0.08);
     }
 
     * {
@@ -48,16 +47,6 @@
       line-height: 1.6;
     }
 
-    .notice {
-      background: var(--warning-bg);
-      border: 1px solid var(--warning-border);
-      color: var(--warning-text);
-      padding: 16px 18px;
-      border-radius: 14px;
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
-
     h2 {
       margin: 0 0 16px;
       font-size: 20px;
@@ -79,14 +68,14 @@
       border-radius: 18px;
       padding: 20px;
       transition: 0.2s ease;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+      box-shadow: var(--shadow-sm);
     }
 
     .card:hover {
       transform: translateY(-2px);
       background: var(--panel-hover);
       border-color: #cbd5e1;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+      box-shadow: var(--shadow-md);
     }
 
     .card-title {
@@ -117,42 +106,10 @@
       margin: 0;
     }
 
-    .archive-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
-    }
-
-    .archive-box p {
-      margin: 0 0 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .archive-link {
-      display: inline-block;
-      text-decoration: none;
-      color: #b45309;
-      font-weight: 600;
-    }
-
-    .archive-link:hover {
-      text-decoration: underline;
-    }
-
     .footer {
       margin-top: 40px;
       color: var(--muted);
       font-size: 13px;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 6px;
     }
   </style>
 </head>
@@ -160,12 +117,8 @@
   <div class="container">
     <h1>Agent AAS Demo Index</h1>
     <p class="subtitle">
-      This repo contains current Agent AAS simulation demos and archived prototype files kept for reference.
+      This repo contains the current Agent AAS simulation demos.
     </p>
-
-    <div class="notice">
-      Please use the files listed below as the current demos. Files inside <code>archive/</code> are deprecated and should not be used as the source of truth for implementation.
-    </div>
 
     <h2>Current demos</h2>
     <div class="grid">
@@ -190,17 +143,8 @@
       </a>
     </div>
 
-    <h2>Archived files</h2>
-    <div class="archive-box">
-      <p>
-        Older prototype files are kept in the archive folder for reference only.
-        These files may contain outdated flows, older UI patterns, or behavior that no longer reflects the latest product direction.
-      </p>
-      <a class="archive-link" href="./archive/">Open archive folder</a>
-    </div>
-
     <p class="footer">
-      Repo note: if a file is not listed under <strong>Current demos</strong>, please confirm before using it for development.
+      Repo note: please use the files listed above as the current demos for review and development.
     </p>
   </div>
 </body>
