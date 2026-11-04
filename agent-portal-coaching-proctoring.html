@@ -7100,6 +7100,14 @@ body.ap.ap-ai-run .ap-ai-bar{box-shadow:0 0 0 100vmax #F6F7FC;clip-path:inset(-1
 body.ap.ap-ai-run, body.ap.ap-ai-run #scr-img, body.ap.ap-ai-run #im, body.ap.ap-ai-run #im .sm-wrap{background:#F6F7FC}
 body.ap.ap-ai-run .ap-ai-bar{margin-bottom:16px;clip-path:inset(-16px -100vmax -16px -100vmax)}
 
+/* Mai (4 Nov): one Prototype menu only. Outside the identity-check overlay the IDV items live inside the agent-portal menu (camera setup page) */
+body.ap:not(.idv-open) #idv-proto{display:none!important}
+#ap-proto.open .sm-proto-menu{max-height:72vh;overflow:auto;width:300px}
+#ap-proto .ap-idv-sec .h{margin-top:4px}
+#ap-proto .ap-idv-sec button.on{background:#E9FEF9;color:#007460}
+#ap-proto .ap-idv-sec button .k{margin-left:auto;font-size:11px;color:#9CA3AF}
+#ap-proto .ap-idv-sec hr{border:none;border-top:1px solid #F3F4F6;margin:6px 4px}
+
 </style>
 <div class="screen" id="scr-apcoach">
 <div class="cp" id="cp-root">
@@ -8442,6 +8450,35 @@ body.ap.ap-ai-run .ap-ai-bar{margin-bottom:16px;clip-path:inset(-16px -100vmax -
   const rc0=PQ.renderChecks; PQ.renderChecks=function(){ const r=rc0.apply(PQ, arguments); fix($('ps-checks')); return r; };
   const vs0=PQ.vstate; PQ.vstate=function(){ const r=vs0.apply(PQ, arguments); fix($('ps-vstate')); return r; };
   const os0=App.openSetup; App.openSetup=function(){ const r=os0.apply(App, arguments); fix($('scr-setup')); return r; };
+
+  /* Mai (4 Nov): IDV prototype links must work from every page that shows the IDV menu.
+     Returning agents land straight on the camera setup (IDV menu still shown there), where the overlay is closed:
+     reopen it first, then jump. Finishing the reopened check returns to the camera setup. */
+  const j0=IDV.jump; IDV.jump=function(key){
+    $('ap-proto').classList.remove('open');
+    if (!document.body.classList.contains('idv-open')){
+      const t=IDV.t||T; IDV.t=t; if (PQ.mode) PQ.stopAll();
+      document.body.classList.remove('idv-camid');
+      IDV.open(t, function(){ const ret=!!IDV.returning; IDV.camId=ret; IDV.idOk=ret; App.openSetup(t); });
+    }
+    const r=j0.apply(IDV, arguments); const sc=$('idv'); if (sc) sc.scrollTop=0; return r;
+  };
+  // camera setup page: the identity-check items join the agent-portal Prototype menu (single menu)
+  const m0=A.menu; A.menu=function(){
+    const r=m0.apply(A, arguments);
+    const src=$('idv-proto-menu'), box=$('ap-proto-menu');
+    if (S.screen==='setup' && src && box) box.insertAdjacentHTML('afterbegin', '<div class="ap-idv-sec">'+src.innerHTML.replace('Result of this check','Identity check · result')+'<hr></div>');
+    return r;
+  };
+  const rm0=IDV.renderMenu; IDV.renderMenu=function(){ const r=rm0.apply(IDV, arguments); if (S.screen==='setup') A.menu(); return r; };
+  // "Returning · …" links: always restart the camera setup in test mode, so the change is visible even from the setup page
+  const cj0=IDV.camJump; IDV.camJump=function(o){
+    $('ap-proto').classList.remove('open');
+    const t=IDV.t||T; IDV.t=t; T.proctored=true; A.mode='test'; if (PQ.mode) PQ.stopAll();
+    const r=cj0.apply(IDV, arguments); window.scrollTo(0, 0);
+    App.toast(o==='face' ? 'Returning agent · the face check (It’s you) will fail' : 'Returning agent · the face check (It’s you) will pass','info');
+    return r;
+  };
   const fxb=$('fx-bar'); if (fxb) fix(fxb);
   const fxp=$('fx-picker'); if (fxp) fix(fxp);
 
@@ -8457,7 +8494,7 @@ body.ap.ap-ai-run .ap-ai-bar{margin-bottom:16px;clip-path:inset(-16px -100vmax -
     CP.onPlayback=function(name){ const k=kindOf(name); if (k && A.data[k].res.test){ A.use(k); A.review('test'); } else App.toast('Prototype: playback is wired for the hotel simulations only','info'); };
   }
 
-  document.addEventListener('click', function(e){ const p=$('ap-proto'); if(p && !p.contains(e.target)) p.classList.remove('open'); });
+  document.addEventListener('click', function(e){ const p=$('ap-proto'); if(p && e.target.isConnected && !p.contains(e.target)) p.classList.remove('open'); });
   document.addEventListener('keydown', function(e){ if (e.key==='Escape'){ if ($('ap-mdl-check').classList.contains('show')) A.closeCheck(); if ($('ap-mdl-exit').classList.contains('show')) A.closeMdl('ap-mdl-exit'); } });
 
   document.body.classList.add('ap');
