@@ -7793,6 +7793,8 @@ body.ap:not(.idv-open) #idv-proto{display:none!important}
     hd: function(close){ return '<div class="ap-hd"><h2>Training Courses</h2><button class="ap-x" type="button" aria-label="Close" onclick="'+(close||'AP.close()')+'">'+X_SVG+'</button></div>'; },
     page: function(id, inner, art){ $(id).innerHTML = '<div class="ap-page'+(art?' art':'')+'">'+A.hd()+'<div class="ap-main">'+inner+'</div></div>'; },
     home: function(){ A.stopCall(); A.stopAI(); A.stopVideo(); if (PQ.mode) PQ.stopAll(); A.closeAll(); App.nav('apcoach'); window.scrollTo(0, A.coachY||0); },   // back where they left the Coaching page
+    // Mai (4 Nov): Exit on the result screen goes back to this sim's overview page (top), not the Coaching tab
+    exitResult: function(){ A.stopCall(); A.stopAI(); A.stopVideo(); A.stopPl(); if (PQ.mode) PQ.stopAll(); A.closeAll(); A.openOverview(); window.scrollTo(0, 0); },
     close: function(){
       if (S.screen==='apcall' && A.call && !A.call.done){ A.askExit(); return; }
       if (S.screen==='img' && ISIM.st && ISIM.st.phase==='run'){ A.askExit(); return; }
@@ -8051,7 +8053,7 @@ body.ap:not(.idv-open) #idv-proto{display:none!important}
           A.scores(r,'Overall Score')+
           '<div class="ap-pass">Required Pass Mark: <b>'+T.threshold+'%</b></div>'+
           '<ul class="ap-fb">'+A.feedback(r).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'+
-          '<div class="ap-actions"><button class="ap-btn" type="button" onclick="AP.review(\''+kind+'\')">Review detailed result</button><button class="ap-btn pri" type="button" onclick="AP.home()">Exit</button></div>'+
+          '<div class="ap-actions"><button class="ap-btn" type="button" onclick="AP.review(\''+kind+'\')">Review detailed result</button><button class="ap-btn pri" type="button" onclick="AP.exitResult()">Exit</button></div>'+
         '</div>'+
         '<div class="ap-pbk"><div class="ap-pbk-h"><h2>Audio Playback</h2><p>Listen to the whole conversation and compare what you said with the script. The line that’s playing is highlighted.</p></div>'+
           A.playerHTML()+A.convHTML(r)+'</div>', true);
@@ -8275,7 +8277,7 @@ body.ap:not(.idv-open) #idv-proto{display:none!important}
           (msg?'<p class="ap-ai-fb">'+esc(msg)+'</p>':'')+
         '</div>'+
         '<div class="ap-pbk ap-flow">'+RV.flowHTML(rv, true)+
-          '<div class="ap-actions"><button class="ap-btn" type="button" onclick="AP.review(\''+kind+'\')">Review detailed result</button><button class="ap-btn pri" type="button" onclick="AP.home()">Exit</button></div></div>', true);
+          '<div class="ap-actions"><button class="ap-btn" type="button" onclick="AP.review(\''+kind+'\')">Review detailed result</button><button class="ap-btn pri" type="button" onclick="AP.exitResult()">Exit</button></div></div>', true);
     },
     reviewAI: function(kind){
       const r=A.res[kind], rv=r.review, st=RV.status(r), msg=RV.sysMessage(rv, st) || rv.feedback;
