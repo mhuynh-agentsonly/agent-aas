@@ -7117,6 +7117,10 @@ body.ap:not(.idv-open) #idv-proto{display:none!important}
 body.ap .rv-end:not(.term){background:#F9FAFB;border:1px solid #EAECF0;border-radius:8px;color:#344054;font-size:14px;padding:12px 16px;gap:12px}
 body.ap .rv-end:not(.term) .lci{flex:none;color:#667085}
 
+/* phone camera screens: the title bar (z-index 3, full width) covered the round back button (z-index 2), so it couldn't be clicked */
+.idv-cam .back{z-index:4}
+.idv-cam .top{pointer-events:none}
+
 </style>
 <div class="screen" id="scr-apcoach">
 <div class="cp" id="cp-root">
@@ -8654,6 +8658,9 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
 /* DS Badge · Gray · icon leading (AO DS V3 1046:3819): 12px icon, 6px left padding */
 .ap-badge.idc-badge-lead{padding-left:6px;gap:4px}
 .ap-badge.idc-badge-lead .lci{flex:none;color:#667085}
+/* phone start screen: "Not this ID?" as a normal teal link */
+.idc-notid.lt{display:inline-block;margin:10px 0 0;padding:0;color:#007460;opacity:1;font-size:14px;text-align:left}
+body.idc .idv-steps .idv-step .r{white-space:nowrap}
 
 </style>
 <script id="idc-js">
@@ -8709,6 +8716,12 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
 
   const kvT=function(){ const t=IDV.t; return t?'<div class="idv-kv"><div><span>Test</span><b>'+esc(t.name)+'</b></div><div><span>Next</span><b>Device setup</b></div></div>':''; };
   const docLine='<b>'+ONFILE.label+'</b> ('+ONFILE.country+')';
+  // Mai (5 Nov): not "ID on file" (too vague) → the ID uploaded when they joined, saved in Account settings
+  const SAVED='the ID you uploaded when you joined';
+  const notIdSheet=function(desk){ return '<div class="idc-sheet'+(desk?' dk':'')+'" role="dialog" aria-label="Using a different ID"><div class="in">'+
+    '<span class="i">'+ic('id-card',20)+'</span><h3>Need to use a different ID?</h3>'+
+    '<p>We can only compare your photos with '+SAVED+' — your <b>'+ONFILE.label+'</b> ('+ONFILE.country+'), saved in your <b>Account settings</b>. If you no longer have it, contact support to update it before you take the test.</p>'+
+    '<div class="acts"><button class="gbtn idv-pbtn" onclick="IDV.notThis(false)">Got it</button><button class="obtn idv-pbtn" onclick="App.toast(\'Prototype: opens a support request\',\'info\')">'+ic('mail',16)+' Contact support</button></div></div></div>'; };
   const audio=function(){ const t=IDV.t||cur(); return !!(t && t.engine==='sim' && t.simMode!=='image'); };
 
   const dk0=IDV.deskHTML;
@@ -8718,7 +8731,7 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       '<h2>Verify your identity</h2>'+
       '<p class="lead">Before your test, take photos of your ID. We compare them with the ID you gave us when you joined. It takes about a minute, and we do it before every test.</p>'+
       '<ul class="idv-list">'+
-        '<li><span class="ic">'+ic('id-card',18)+'</span><div><b>The same ID you joined with</b>Your '+ONFILE.label+' ('+ONFILE.country+'). It must be the original and valid today.</div></li>'+
+        '<li><span class="ic">'+ic('id-card',18)+'</span><div><b>The ID you uploaded when you joined</b>Your '+ONFILE.label+' ('+ONFILE.country+'), saved in your Account settings. It must be the original and valid today.</div></li>'+
         '<li><span class="ic">'+ic('smartphone',18)+'</span><div><b>A phone with a camera</b>Or use this computer’s webcam.</div></li>'+
         '<li><span class="ic">'+ic('camera',18)+'</span><div><b>Your camera on during the test</b>We take a few photos of you at random times to confirm it’s you.</div></li>'+
       '</ul>'+
@@ -8735,7 +8748,7 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
 
     if (s==='verifying'){
       const v=this.vstage||0, f=this.vfail||0;
-      const rows=['ID is clear and readable','ID is valid today','Same type of ID as on file ('+ONFILE.label+')','Name matches your account'];
+      const rows=['ID is clear and readable','ID is valid today','Same ID type you joined with ('+ONFILE.label+')','Name matches your account'];
       const fl={2:'Expired',3:'Different ID',4:'Doesn’t match'};
       return '<div class="idv-center"><div class="idv-anim-wrap">'+IDV.anim.id()+'</div>'+
         '<h2>Checking your ID…</h2><p class="lead">This takes a few seconds. Please keep this window open.</p></div>'+
@@ -8745,19 +8758,19 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
           if (n===v+1 && !f) return IDV.stepRow('busy', r, 'Checking…');
           return IDV.stepRow('wait', r, '');
         }).join('')+
-        IDV.stepRow('skip','Your photo matches the ID on file','After your test')+'</div>';
+        IDV.stepRow('skip','Your face matches your ID photo','After your test')+'</div>';
     }
 
     if (s==='verified') return '<div class="idv-center">'+
       '<div class="idv-anim-wrap" style="margin:-8px 0 8px">'+IDV.anim.ok()+'</div>'+
       '<h2>Your ID is checked, '+ME.first+'</h2>'+
-      '<p class="lead">It matches the ID you joined with. Next, a quick '+(audio()?'camera, mic and speaker':'camera')+' check. We’ll take a few photos of you at random times during the test and finish your identity check after you submit.</p></div>'+
+      '<p class="lead">It matches the ID you uploaded when you joined. Next, a quick '+(audio()?'camera, mic and speaker':'camera')+' check. We’ll take a few photos of you at random times during the test and finish your identity check after you submit.</p></div>'+
       kvT()+
       '<div class="idv-foot split"><span></span><button class="gbtn" onclick="IDV.start()">Continue to device setup '+ic('arrow-right',16)+'</button></div>';
 
     if (s==='doc-expired') return '<div class="idv-fic warn">'+ic('id-card',24)+'</div>'+
       '<h2>Your ID has expired</h2>'+
-      '<p class="lead">We can only accept an ID that is valid today. If you’ve renewed your '+ONFILE.label+', take photos of the new one. If you haven’t, contact support to update the ID on file.</p>'+
+      '<p class="lead">We can only accept an ID that is valid today. If you’ve renewed your '+ONFILE.label+', take photos of the new one. If you haven’t, contact support to update the ID saved in your Account settings.</p>'+
       '<div class="idv-kv"><div><span>Document</span><b>'+ONFILE.label+'</b></div><div><span>Expiry date</span><b class="err">14 Mar 2024</b></div></div>'+
       '<div class="idv-foot split"><button class="obtn" onclick="IDV.exit()">Back to Skills Center</button><button class="gbtn" onclick="IDV.outcome=\'pass\';IDV.renderMenu();IDV.resetProg();IDV.go(\'device\', null)">'+ic('refresh-cw',16)+' Retake with renewed ID</button></div>';
 
@@ -8766,8 +8779,8 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       return '<div class="idv-fic warn">'+ic('id-card',24)+'</div>'+
         '<h2>This isn’t the ID you joined with</h2>'+
         '<p class="lead">To compare your ID, we need the same type of ID you gave us when you joined. Take photos of your '+ONFILE.label+' instead.</p>'+
-        '<div class="idv-kv"><div><span>ID on file</span><b>'+ONFILE.label+' · '+ONFILE.country+'</b></div><div><span>ID you used</span><b class="err">'+used+'</b></div></div>'+
-        '<div class="idv-alert info">'+ic('info',16)+'<div>Lost it or got a different ID since you joined? Contact support to update the ID on file first.</div></div>'+
+        '<div class="idv-kv"><div><span>ID you uploaded when you joined</span><b>'+ONFILE.label+' · '+ONFILE.country+'</b></div><div><span>ID you used</span><b class="err">'+used+'</b></div></div>'+
+        '<div class="idv-alert info">'+ic('info',16)+'<div>Lost it or got a different ID since you joined? Contact support to update the ID saved in your Account settings first.</div></div>'+
         '<div class="idv-foot split"><button class="obtn" onclick="IDV.exit()">Back to Skills Center</button><button class="gbtn" onclick="IDV.outcome=\'pass\';IDV.doc=\''+ONFILE.doc+'\';IDV.vfail=0;IDV.renderMenu();IDV.resetProg();IDV.go(\'device\', null)">'+ic('refresh-cw',16)+' Use my '+ONFILE.label+'</button></div>';
     }
 
@@ -8789,8 +8802,8 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       '<div class="idv-foot split"><button class="obtn" onclick="IDV.exit()">Back to Skills Center</button><button class="gbtn" onclick="App.toast(\'Prototype: opens a support request\',\'info\')">'+ic('mail',16)+' Contact support</button></div>';
 
     if (s==='no-onfile') return '<div class="idv-fic warn">'+ic('circle-help',24)+'</div>'+
-      '<h2>We don’t have an ID on file for you</h2>'+
-      '<p class="lead">We compare your ID with the one you gave us when you joined, but we couldn’t find it. Contact support to add your ID, then come back to take the test.</p>'+
+      '<h2>We can’t find the ID you uploaded when you joined</h2>'+
+      '<p class="lead">We compare your ID with the one you uploaded when you joined Agents Only, which is saved in your Account settings — but there’s no ID there. Contact support to add it, then come back to take the test.</p>'+
       '<div class="idv-foot split"><button class="obtn" onclick="IDV.exit()">Back to Skills Center</button><button class="gbtn" onclick="App.toast(\'Prototype: opens a support request\',\'info\')">'+ic('mail',16)+' Contact support</button></div>';
 
     return dk0.apply(IDV, arguments);
@@ -8804,9 +8817,10 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
     const P=function(inner, cls){ return sb()+'<div class="idv-pbody'+(cls?' '+cls:'')+'">'+(desk?'':brand)+inner+'</div>'; };
 
     if (ph==='hello') return P(
-      '<h3>Hi '+ME.first+', let’s check your ID</h3><p>Take photos of your <b>'+ONFILE.label+'</b> — the same ID you joined with. Your computer will update when you’re done.</p>'+
+      '<h3>Hi '+ME.first+', let’s check your ID</h3><p>Take photos of your <b>'+ONFILE.label+'</b> — '+SAVED+'. Your computer will update when you’re done.</p>'+
+      '<button type="button" class="idc-notid lt" onclick="IDV.notThis()">Not this ID?</button>'+     // Mai (5 Nov): before the camera opens, where it's easy to see
       '<div class="grow"></div><p style="font-size:12px;color:#6B7280;margin-bottom:6px">We’ll ask to use your camera.</p>'+
-      '<button class="gbtn idv-pbtn" onclick="IDV.camGate()">Start</button>');
+      '<button class="gbtn idv-pbtn" onclick="IDV.camGate()">Start</button>')+(this.notId?notIdSheet(false):'');
 
     if (ph==='front'){
       let h=ph0.apply(IDV, arguments)
@@ -8814,11 +8828,8 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
         .replace('Take a photo of the front of your ID','Take a photo of the front of your '+ONFILE.label)
         .replace('Front of your ID','Front of your '+ONFILE.label);
       const link='<button type="button" class="idc-notid" onclick="IDV.notThis()">Not this ID?</button>';
-      h = desk ? h.replace('<div class="dk-act">','<div class="dk-act">'+link) : h.replace('<button class="idv-shutter"', link+'<button class="idv-shutter"');
-      if (this.notId) h+='<div class="idc-sheet'+(desk?' dk':'')+'" role="dialog" aria-label="Using a different ID"><div class="in">'+
-        '<span class="i">'+ic('id-card',20)+'</span><h3>Need to use a different ID?</h3>'+
-        '<p>We can only compare your photos with the ID on file: your <b>'+ONFILE.label+'</b> ('+ONFILE.country+'). If you no longer have it, contact support to update the ID on file before you take the test.</p>'+
-        '<div class="acts"><button class="gbtn idv-pbtn" onclick="IDV.notThis(false)">Got it</button><button class="obtn idv-pbtn" onclick="App.toast(\'Prototype: opens a support request\',\'info\')">'+ic('mail',16)+' Contact support</button></div></div></div>';
+      if (desk) h=h.replace('<div class="dk-act">','<div class="dk-act">'+link);   // webcam: the link sits next to "Take photo" (phone: on the start screen instead)
+      if (this.notId && desk) h+=notIdSheet(true);
       return h;
     }
 
@@ -8891,12 +8902,14 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       '<div class="h">Result of this check</div>'+
       b("IDV.setOutcome('pass')",'circle-check','Match — ID checked',o==='pass')+
       b("IDV.setOutcome('name')",'user-x','Name doesn’t match account',o==='name','blocks')+
-      b("IDV.setOutcome('type')",'id-card','Different ID type than on file',o==='type','retry')+
+      b("IDV.setOutcome('type')",'id-card','Different ID type than the one uploaded at joining',o==='type','retry')+
       b("IDV.setOutcome('expired')",'circle-alert','ID has expired',o==='expired','retry')+
       '<hr><div class="h">Jump to</div>'+
       b("IDV.jump('intro')",'shield-check','ID check · intro')+
       b("IDV.jump('waiting')",'qr-code','Desktop · scan QR code')+
       b("IDV.jump('ph-id')",'id-card','Phone · photo of ID')+
+      b("IDV.jump('ph-notid')",'circle-help','Phone · “Not this ID?” sheet')+
+      b("IDV.jump('wc-notid')",'circle-help','Webcam · “Not this ID?” sheet')+
       b("IDV.jump('webcam')",'laptop','Webcam on this computer')+
       b("IDV.jump('ph-idproc')",'upload','Phone · uploading ID')+
       b("IDV.jump('verifying')",'loader-circle','Checking your ID → result')+
@@ -8904,12 +8917,12 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       '<hr><div class="h">Error states</div>'+
       b("IDV.jump('cam')",'camera-off','Camera blocked on phone')+
       b("IDV.jump('blurry')",'eye-off','Blurry ID photo')+
-      b("IDV.jump('type')",'id-card','Different ID type than on file')+
+      b("IDV.jump('type')",'id-card','Different ID type than the one uploaded at joining')+
       b("IDV.jump('expired')",'circle-alert','ID has expired')+
       b("IDV.jump('qr')",'alarm-clock','QR code expired')+
       b("IDV.jump('disc')",'wifi-off','Phone disconnected')+
       b("IDV.jump('lastfail')",'triangle-alert','Name mismatch · 3rd (final) attempt')+
-      b("IDV.jump('nofile')",'circle-help','No ID on file')+
+      b("IDV.jump('nofile')",'circle-help','No ID saved from joining')+
       b("IDV.jump('locked')",'lock','Tests locked (after 3 fails)')+
       '<hr>'+b("IDV.jump('unlock')",'rotate-ccw','Reset ID check');
     if (S.screen==='setup' && A.menu) A.menu();               // the setup page shows these items inside the single Prototype menu
@@ -8932,6 +8945,8 @@ body.idc .idv-step.fail .r{color:#D92D20;font-weight:500}
       case 'waiting': base(); T.mode='phone'; T.go('waiting', null); break;
       case 'ph-id': base(); T.mode='phone'; T.desk='waiting'; T.p('front'); break;
       case 'webcam': base(); T.mode='webcam'; T.chooseDevice(); break;
+      case 'ph-notid': base(); T.mode='phone'; T.desk='waiting'; T.p('hello'); T.notThis(); break;
+      case 'wc-notid': base(); T.mode='webcam'; T.chooseDevice(); T.notThis(); break;
       case 'ph-idproc': base(); T.mode='phone'; T.desk='waiting'; T.p('id-processing'); break;
       case 'verifying': base(); T.mode='phone'; T.phone=null; T.toVerifying(); break;
       case 'verified': base(); T.mode='webcam'; IDC.checkedAt=Date.now(); T.go('verified', null); break;
